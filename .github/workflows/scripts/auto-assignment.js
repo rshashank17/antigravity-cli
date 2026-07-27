@@ -12,7 +12,7 @@ module.exports = async ({ github, context }) => {
     return;
   }
 
-  const assigneesList = ["rshashank17"];
+  const assigneesList = ["manirajc"];
   const issueNumber = context.payload.issue.number;
 
   console.log("assignee list", assigneesList);
