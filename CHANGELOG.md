@@ -2,6 +2,52 @@
 
 The terminal-first surface to interact with Antigravity agents. Stay in your flow without context switching.
 
+## 1.1.7
+
+- Improved permission prompts for compound shell commands so the full command is shown when any part of it needs approval.
+- Fixed disabled plugins still running their hooks and contributing other customizations, which could keep a broken hook active and break file-editing tools even after the plugin was turned off.
+- Fixed MCP OAuth against providers that do not strictly follow the spec (such as Salesforce and Atlassian) by relaxing issuer validation and including the `refresh_token` grant.
+- Fixed `/btw` failing with a "parent conversation not found" error when used as the very first action in a fresh session.
+- Fixed clipboard corruption of CJK and other non-ASCII text when copying on Windows.
+- Fixed print mode (`-p`) sending a prompt before the account-eligibility check finished.
+
+## 1.1.6
+
+- Custom Agents (Markdown Format). Added support for defining custom agents using Markdown files (`agent.md`) with YAML frontmatter and H1-delimited system prompts. Markdown agents support `mainAgent`, `subagent`, `hidden`, `inheritMcp`, and `commandExecutionPolicy` frontmatter fields for fine-grained control over agent behavior. Dynamically defined subagents (via `define_subagent`) now also write Markdown format so they resolve correctly on external builds.
+- Added an optional index argument to `/copy` so `/copy <n>` copies the n-th most recent response to the clipboard, while `/copy` and `/copy 1` still copy the latest.
+- Improved `/codesearch` to render results progressively as they stream in, showing a live count while loading and letting you cancel an in-flight search with `Esc` instead of blocking until the whole search finishes.
+- Improved default file access by granting read access to the system temporary directory out of the box, resolved correctly per platform, so agents no longer trigger permission prompts when reading temporary files.
+- Improved support for markdown-based custom agents so custom agent management and selection behave more consistently.
+- Improved customization discovery by sorting rules and discovered paths deterministically, preventing unstable prompt ordering and needless prompt-cache misses.
+- Improved overall reliability and stability across the CLI with additional hardening and fixes for intermittent failures in background tasks, print mode, and interactive flows.
+- Fixed switching from a custom agent back to the default agent via `/agents`, which previously failed silently and left the conversation stuck on the custom agent's persona.
+- Fixed a crash when a command was blocked by sandbox permissions before its output was captured, and cleaned up the permission approval and denial messages.
+- Fixed the artifact viewer emitting garbage escape bytes when cycling to image mode on terminals that are detected but cannot actually render Kitty graphics, such as iTerm2.
+- Fixed the first keystroke (such as `Esc`) being dropped when opening the first artifact view on some non-Kitty terminals.
+- Fixed conversation jitter and a stranded input box during streaming so transient markdown reflow no longer shifts the pending line and input box upward.
+- Fixed print mode (`-p`) surfacing the real conversation-creation failure instead of a misleading "no active conversation" error.
+- Fixed the message list dropping its header when rewinding or resetting conversation steps.
+- Fixed a background auto-updater double-spawn race where two processes could each spawn an updater within a single update window.
+- Fixed sandbox error reporting so blocked actions are recorded even when the network proxy is disabled.
+- Fixed the screen going blank after the authentication page.
+- Fixed the `ctrl+b` shortcut being hardcoded to background shell commands even when none were running, so a remapped `ctrl+b` is now respected whenever there are no running shell commands in the conversation.
+
+## 1.1.5
+
+- Added a `/effort` command to view and change the current model's reasoning effort, with a left/right timeline-gauge picker and a direct `/effort <level>` form so you can trade latency for depth on the fly.
+- Added an `--effort` flag to select a model's reasoning-effort variant when launching the CLI.
+- Added stable, user-facing model slugs that appear in the `/model` picker and are accepted by `--model`, so you can pin a specific model reliably across sessions.
+- Added a `model` option to custom agent frontmatter so an agent runs at a chosen model tier (such as `flash` or `pro`) when invoked as a subagent, defaulting to `inherit` (the parent's model).
+- Redesigned the `/model` picker to group models by their base model and choose reasoning effort from a timeline gauge navigable with Left and Right, and added an effort badge to the status line for models that expose multiple effort variants.
+- Improved the `/settings` (`/config`) panel by making it a bounded, scrollable list so it renders correctly in short terminals instead of overflowing, and stopped it from flickering when opening and closing dropdowns.
+- Improved background-task reliability by moving long-running work onto a shared lifecycle with deterministic startup and shutdown and panic-safe launching, so a failure in one background task no longer disrupts the session and pending analytics are flushed on exit instead of dropped.
+- Improved responsiveness of bursty background refreshes by coalescing rapid repeated triggers into a single run, cutting redundant work.
+- Fixed a crash when triggering Authenticate on a remote MCP server in the `/mcp` panel.
+- Fixed MCP tool results containing embedded resources being silently dropped, so text and inline media returned by MCP servers now surface in the conversation.
+- Fixed permission checks splitting a single command into a pipeline when an argument contained quoted shell metacharacters (such as `--grep="a|b"`), which caused spurious permission prompts.
+- Fixed the file-view and file-search tools failing with invalid-UTF-8 errors when a multi-byte character was split at a truncation boundary.
+- Fixed a data race when collecting customization rules by guarding the shared structures.
+
  ## 1.1.4
 
 - Added support for stacking multiple leading slash commands in a single prompt, so a chain like `/plan /grill-me <prompt>` parses, activates, and renders every command in the order you typed them.
